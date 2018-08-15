@@ -1,0 +1,39 @@
+
+
+
+#  ID: {{ vipid }}
+#  DOMAIN: {{ vipdomainname }}
+#  SSL cert: {{ vipsslcert }}
+#  Edited: {{ edited }}
+#  Version: 1
+
+{% for vipip in vipips %}
+#****** Service: {{ vipservicename }}-P80 *******
+{{vipip.desc}}
+add lb vserver {{ vipservicename }}-P80_VIP HTTP {{ vipip.ip }} 80 -httpProfileName SAIT-HTTPstandard -tcpProfileName SAIT-TCPVIPstandard
+bind lb vserver {{ vipservicename }}-P80_VIP AlwaysUp_SG
+bind lb vserver {{ vipservicename }}-P80_VIP -policyName HTTP-TO-HTTPS_POL -priority 100 -type REQUEST
+
+{% endfor %}
+
+
+{% for vipip in vipips %}
+#****** Service: {{ vipservicename }} *******
+{{vipip.desc}}
+{% for sgserver in sgservers %}
+add server {{sgserver.name}} {{sgserver.ip}}
+{% endfor %}
+add lb monitor {{ vipservicename }}_MON HTTP -respCode 200 -httpRequest "HEAD {{ vipprobeurl }}" -customHeaders "Host: {{ vipdomainname }}\r\n" -LRTM DISABLED
+add serviceGroup {{ vipservicename }}_SG HTTP -cip ENABLED X-Forwarded-For -tcpProfileName SAIT-TCPSGstandard -netProfile SAIT-SNIPset -usip NO
+{% for sgserver in sgservers %}
+bind serviceGroup {{ vipservicename }}_SG {{sgserver.name}} {{sgserver.port}}
+{% endfor %}
+bind serviceGroup {{ vipservicename }}_SG -monitorName {{ vipservicename }}_MON
+add lb vserver {{ vipservicename }}_VIP SSL {{ vipip.ip }} 443 -httpProfileName SAIT-HTTPstandard -tcpProfileName SAIT-TCPVIPstandard
+bind lb vserver {{ vipservicename }}_VIP {{ vipservicename }}_SG
+set ssl vserver {{ vipservicename }}_VIP -sslProfile SAIT-SSLstandard
+bind ssl vserver {{ vipservicename }}_VIP -certkeyName {{ vipsslcert }}
+bind lb vserver {{ vipservicename }}_VIP -policyName XFORWARDEDPROTOHTTPS_POL -priority 100 -gotoPriorityExpression END -type REQUEST
+
+{% endfor %}
+

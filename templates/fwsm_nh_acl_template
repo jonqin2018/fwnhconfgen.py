@@ -1,0 +1,153 @@
+
+**********
+
+{% if newnetobj  %}
+{% for netobjname in netobjnames %}
+{% if netobjname.name %}
+:  generator object for {{sssiiicccaaa}} permit custom-xxx (src,dst} = idcp idcs {{netobjname.name}}
+{% endif %}
+{% endfor %}
+{% endif  %}
+
+{% if newportobj %}
+{% for portobjname in portobjnames %}
+{%if portobjname.name%}
+:  generator object for lhrissercom permit custom-xxx {srv} = {{portobjname.protocol}} {{portobjname.name}}
+{%endif%}
+{% endfor %}
+{% endif %}
+
+:  generator object for {{iprange}} permit {{customnumber}} {src,dst,srv} = idcp idcs {{sssiiicccaaa }}  {{dstobj|join(', ')}}  <-- idcp idcs {{srcobj|join(', ')}}   << inbound
+
+
+{% if newnetobj %}
+{% for netobjname in netobjnames %}
+{% if netobjname.name %}
+:  generator object for {{sssiiicccaaa}} permit custom-xxx (src,dst} = idcp idcs {{netobjname.name}}
+:  description is " {{netobjname.objdescr}} "
+
+no object-group network o-net{{sssiiicccaaa}}-p-cxxx-{{netobjname.name}}
+   object-group network o-net{{sssiiicccaaa}}-p-cxxx-{{netobjname.name}}
+   description o-{{sssiiicccaaa}} permit custom-xxx idcp idcs {{netobjname.name}}
+:  EXPIRES: never  INSTALLED: {{insttime}}  BY: cq  FOR: information systems
+:  DESCR:    {{netobjname.nwkdescr}} {% for network in  netobjname.network %}   
+   network-object  {{network}} {% endfor %}   
+{% endif %}
+{% endfor %}
+
+{% endif %}
+
+{% if newportobj %}
+
+{% for portobjname in portobjnames %}
+{% if portobjname.name %}
+:  generator object for {{sssiiicccaaa}} permit custom-xxx (src,dst} = {{portobjname.protocol}} {{portobjname.name}}
+:  description is {{portobjname.objdescr}}
+
+no object-group service o-srv{{sssiiicccaaa}}-p-cxxx-{{portobjname.name}}  {{portobjname.protocol}}
+   object-group service o-srv{{sssiiicccaaa}}-p-cxxx-{{portobjname.name}}  {{portobjname.protocol}}
+   description o-{{sssiiicccaaa}} permit custom-xxx idcp idcs {{portobjname.name}}
+:  EXPIRES: never  INSTALLED: {{insttime}}  BY: cq  FOR: information systems
+:  DESCR:  {{portobjname.portdescr}}
+{% for port in portobjname.port %}
+   port-object {{port}}
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+
+{% endif %}
+:-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+:  generator object for {{sssiiicccaaa}} {{iprange}} permit {{customnumber}} {src,dst,srv} =  idcp idcs {{sssiiicccaaa }}    {{dstobj|join(', ')}}  <-- idcp idcs   {{srcobj|join(', ')}}    <<inbound
+:  description is " {{ruledescr}} "
+
+no object-group network o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-src
+   object-group network o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-src
+   description o-{{iprange}}-{{sssiiicccaaa}} permit {{cnumber}}- src idcp idcs  {{srcobjname}}  
+:  group-object o-net{{sssiiicccaaa}}rsv
+:  comment-out o-net{{sssiiicccaaa}}rsv and add {{sssiiicccaaa}} permit {{cnumber}}-  {{srcobjname}} 
+:  EXPIRES: never  INSTALLED: {{insttime}}  BY: cq  FOR: information systems
+{% for src in srcobj %}
+   group-object o-net{{sssiiicccaaa}}-p-cxxx-{{src}}
+{% endfor %} 
+
+no object-group network o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-dst
+   object-group network o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-dst
+   description o-{{iprange}}-{{sssiiicccaaa}} permit {{cnumber}}- {{dstobjname}}
+:  group-object o-net{{sssiiicccaaa}}rsv
+:  EXPIRES: never  INSTALLED: {{insttime}}  BY: cq  FOR: information systems
+:  DESCR: 
+{% for dst in dstobj %}
+   group-object o-net{{sssiiicccaaa}}-p-cxxx-{{dst}}
+{% endfor %} 
+
+no object-group service o-srv{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-srv-t tcp
+   object-group service o-srv{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-srv-t tcp
+   description o-{{iprange}}-{{sssiiicccaaa}} permit {{cnumber}}- srv tcp 
+   group-object o-srv{{sssiiicccaaa}}rsv-t
+:  EXPIRES: never  INSTALLED: {{insttime}}  BY: cq  FOR: information systems
+:  DESCR:  
+{% for t in tcp %}
+{%if t %}
+   group-object  {{t}}
+{%endif%}
+{% endfor %} 
+   
+no object-group service o-srv{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-srv-u udp
+   object-group service o-srv{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-srv-u udp
+   description o-{{iprange}}-{{sssiiicccaaa}} permit {{cnumber}}- srv udp 
+{% if udp[0] =='' %}
+   group-object o-srv{{sssiiicccaaa}}rsv-u
+{% else %}:  group-object o-srv{{sssiiicccaaa}}rsv-u
+{% endif %}
+:  comment-out o-srv{{sssiiicccaaa}}rsv and add {{sssiiicccaaa}} permit {{cnumber}}- srv udp's here
+:  EXPIRES: never  INSTALLED: {{insttime}}  BY: cq  FOR: information systems
+:  DESCR: 
+{% for u in udp %}
+{%if u %}
+   group-object  {{u}}
+{%endif%}
+{% endfor %} 
+
+no object-group icmp o-icmp{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-icmp
+   object-group icmp o-icmp{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-icmp
+   description o-{{iprange}}-{{sssiiicccaaa}} permit {{cnumber}}- icmp 
+{% if enableicmp %}
+:  group-object o-icmp{{sssiiicccaaa}}rsv {% else %}  group-object o-icmp{{sssiiicccaaa}}-p-cxxx-dflt
+{% endif %}
+
+:  EXPIRES: never  INSTALLED: {{insttime}}  BY: cq  FOR: information systems
+:  DESCR: permit icmp echo and echo-reply 
+{% if enableicmp %}
+   group-object o-icmp{{sssiiicccaaa}}-p-cxxx-dflt {% else %}:  group-object o-icmp{{sssiiicccaaa}}-p-cxxx-dflt 
+{% endif %}
+
+
+
+no object-group network o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-srcL3
+   object-group network o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-srcL3
+   description o-{{iprange}}-{{sssiiicccaaa}} permit {{cnumber}}- srcL3 
+{% if enablelayer3 %}
+:  group-object o-net{{sssiiicccaaa}}rsv
+{% else %}   group-object o-net{{sssiiicccaaa}}rsv
+{% endif %}
+:  comment-out o-net{{sssiiicccaaa}}rsv and add {{sssiiicccaaa}} permit {{cnumber}}- srcL3's here
+:  EXPIRES: never  INSTALLED: {{insttime}}  BY: cq  FOR: information systems
+:  DESCR:
+{% if enablelayer3 %}
+{% for src in srcobj %}
+   group-object o-net{{sssiiicccaaa}}-p-cxxx-{{src}}
+{% endfor %}
+{% endif %}
+
+
+access-list nohackv2{{sssiiicccaaa}}   remark begin {{sssiiicccaaa}} {{iprange}} permit {{customnumber}} {src,dst,srv}
+access-list nohackv2{{sssiiicccaaa}}   permit tcp   object-group o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-src   object-group o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-dst object-group o-srv{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-srv-t
+access-list nohackv2{{sssiiicccaaa}}   permit udp   object-group o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-src   object-group o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-dst object-group o-srv{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-srv-u
+access-list nohackv2{{sssiiicccaaa}}   permit icmp  object-group o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-src   object-group o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-dst object-group o-icmp{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-icmp
+access-list nohackv2{{sssiiicccaaa}}   permit ip    object-group o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-srcL3 object-group o-net{{sssiiicccaaa}}-{{iprange}}-p-{{cnumber}}-dst
+access-list nohackv2{{sssiiicccaaa}}   remark end   {{sssiiicccaaa}} {{iprange}} permit {{customnumber}} {src,dst,srv}
+
+ 
+ 
