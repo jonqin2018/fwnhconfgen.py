@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import jinja2
 import re
 import datetime
@@ -40,76 +41,76 @@ rvar["portobjnames"] = [
 
 tempvar = dict()
 
-#### inputs
+#### raw_inputs
 
-isthisnewnetobj = input("create new network objects? y or any other key-->  ")
+isthisnewnetobj = raw_input("create new network objects? y or any other key-->  ")
 
 if isthisnewnetobj == 'y':
     # new L1 network object
-    netobjname    = removews(input("object name? --> "))
+    netobjname    = removews(raw_input("object name? --> "))
     rvar["newnetobj"]  = True
     count = len(netobjname)
     for i in range(0,count):
         print ("\n" + str(count) + " network objects will be created")
-        print ("\ninput info for " + netobjname[i] ) 
+        print ("\nraw_input info for " + netobjname[i] ) 
         tempvar['name'] = netobjname[i]
-        tempvar['objdescr']   = input("description -->  ")
-        tempvar['network']    = removews(input("network --> "))
-        tempvar['nwkdescr']   = input("network description -->  ")
+        tempvar['objdescr']   = raw_input("description -->  ")
+        tempvar['network']    = removews(raw_input("network --> "))
+        tempvar['nwkdescr']   = raw_input("network description -->  ")
         rvar["netobjnames"].append(tempvar)       
         print
 
 tempvar = {}
 
-isthisnewportobj = input("\ncreate new tcp port object? y or Enter -->  ")
+isthisnewportobj = raw_input("\ncreate new tcp port object? y or Enter -->  ")
 
 if isthisnewportobj == 'y':
     # new L1 port object
-    portobjname   = removews(input("name: "))
+    portobjname   = removews(raw_input("name: "))
     rvar["newportobj"] = True
     count = len(portobjname)
     for i in range(0,count):
         print (str(count) + " tcp objects will be created")
-        print ("input info for " + portobjname[i] )       
+        print ("raw_input info for " + portobjname[i] )       
         tempvar['name'] =   portobjname[i]  
-        tempvar['objdescr']  = input("description:  ")
+        tempvar['objdescr']  = raw_input("description:  ")
         tempvar['protocol']  = 'tcp'
-        tempvar['port']      = removews(input("tcp ports (eq 135): "))
-        tempvar['portdescr'] = input("port description: ")
+        tempvar['port']      = removews(raw_input("tcp ports (eq 135): "))
+        tempvar['portdescr'] = raw_input("port description: ")
         rvar["portobjnames"].append(tempvar)  
         
 tempvar ={}
-isthisnewportobj = input("\ncreate new udp object? y or Enter -->  ")
+isthisnewportobj = raw_input("\ncreate new udp object? y or Enter -->  ")
 
 if isthisnewportobj == 'y':
     # new L1 port object
-    portobjname   = removews(input("name: "))
+    portobjname   = removews(raw_input("name: "))
     rvar["newportobj"] = True
     count = len(portobjname)
     for i in range(0,count):
         print (str(count) + " udp objects will be created")
-        print ("input info for " + portobjname[i] )       
+        print ("raw_input info for " + portobjname[i] )       
         tempvar['name'] =   portobjname[i]  
-        tempvar['objdescr']  = input("description:  ")
+        tempvar['objdescr']  = raw_input("description:  ")
         tempvar['protocol']  = 'udp'
-        tempvar['port']      = removews(input("tcp ports (eq 53): "))
-        tempvar['portdescr'] = input("port description: ")
+        tempvar['port']      = removews(raw_input("tcp ports (eq 53): "))
+        tempvar['portdescr'] = raw_input("port description: ")
         rvar["portobjnames"].append(tempvar)  
         
 
 print  ("\n")
 
 # l2 rule"
-rulenumber    = input("rule number (eg. 10):   ")
-rulerange     = input("rule range (eg. ten31): ")
-securityid    = input("security id (lhrissercom):  ")
-ruledescr     = input("rule description:  ")
-srcobj        = removews(input("source object group or network:"))
-dstobj        = removews(input("destination object group or network:"))
-tcp           = removews(input("tcp ports: "))
-udp           = removews(input("udp ports: "))
-enableicmp    = input("enable icmp? ")
-enablelayer3  = input("enable layer3? ")
+rulenumber    = raw_input("rule number (eg. 10):   ")
+rulerange     = raw_input("rule range (eg. ten31): ")
+securityid    = raw_input("security id (lhrissercom):  ")
+ruledescr     = raw_input("rule description:  ")
+srcobj        = removews(raw_input("source object group or network:"))
+dstobj        = removews(raw_input("destination object group or network:"))
+tcp           = removews(raw_input("tcp ports: "))
+udp           = removews(raw_input("udp ports: "))
+enableicmp    = raw_input("enable icmp? ")
+enablelayer3  = raw_input("enable layer3? ")
 
        
 rvar["sssiiicccaaa"] = securityid
